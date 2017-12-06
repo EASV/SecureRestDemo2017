@@ -1,10 +1,9 @@
-﻿using System;
-namespace CustomerAppBLL.Converters
+﻿namespace CustomerAppBLL.Converters
 {
-    public class IConverter
+    public interface IConverter<Entity, BO>
     {
-        public IConverter()
-        {
-        }
+        Entity Convert(BO bo);
+
+        BO Convert(Entity ent);
     }
 }

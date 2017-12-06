@@ -3,9 +3,9 @@ using CustomerAppDAL.Entities;
 
 namespace CustomerAppBLL.Converters
 {
-    class UserConverter
+    public class UserConverter: IConverter<User, UserBO>
     {
-        internal User Convert(UserBO user)
+        public User Convert(UserBO user)
         {
 			if (user == null) { return null; }
             return new User()
@@ -17,7 +17,7 @@ namespace CustomerAppBLL.Converters
             };
         }
 
-        internal UserBO Convert(User user)
+        public UserBO Convert(User user)
         {
 			if (user == null) { return null; }
 			return new UserBO()

@@ -9,33 +9,38 @@ using CustomerAppBLL.Converters;
 
 namespace CustomerAppBLL.Services
 {
-    class CustomerService : ICustomerService
+    public class CustomerService : ICustomerService
     {
-        CustomerConverter conv = new CustomerConverter();
-        AddressConverter aConv = new AddressConverter();
-        DALFacade facade;
-        public CustomerService(DALFacade facade)
+        IConverter<Customer, CustomerBO> _cConv;
+        IConverter<Address, AddressBO> _aConv;
+        IDALFacade _facade;
+        public CustomerService(IDALFacade facade,
+                           IConverter<Customer, CustomerBO> cConv = null,
+                           IConverter<Address, AddressBO> aConv = null)
         {
-            this.facade = facade;
+            
+            _facade = facade;
+            _cConv = cConv ?? new CustomerConverter();
+            _aConv = aConv ?? new AddressConverter();
         }
         
         public CustomerBO Create(CustomerBO cust)
         {
-            using(var uow = facade.UnitOfWork)
+            using(var uow = _facade.UnitOfWork)
             {
-				var newCust = uow.CustomerRepository.Create(conv.Convert(cust));
+                var newCust = uow.CustomerRepository.Create(_cConv.Convert(cust));
 				uow.Complete();
-				return conv.Convert(newCust);
+                return _cConv.Convert(newCust);
             }
         }
 
         public void CreateAll(List<CustomerBO> customers)
         {
-            using (var uow = facade.UnitOfWork)
+            using (var uow = _facade.UnitOfWork)
             {
                 foreach (var customer in customers)
                 {
-                    uow.CustomerRepository.Create(conv.Convert(customer));
+                    uow.CustomerRepository.Create(_cConv.Convert(customer));
                     
                 }
                 uow.Complete();
@@ -44,20 +49,20 @@ namespace CustomerAppBLL.Services
 
         public CustomerBO Delete(int Id)
         {
-			using (var uow = facade.UnitOfWork)
+			using (var uow = _facade.UnitOfWork)
 			{
 				var newCust = uow.CustomerRepository.Delete(Id);
 				uow.Complete();
-				return conv.Convert(newCust);
+                return _cConv.Convert(newCust);
 			}
         }
 
         public CustomerBO Get(int Id)
         {
-            using (var uow = facade.UnitOfWork)
+            using (var uow = _facade.UnitOfWork)
 			{
                 //1. Get and convert the customer
-                var cust = conv.Convert(uow.CustomerRepository.Get(Id));
+                var cust = _cConv.Convert(uow.CustomerRepository.Get(Id));
 
                 //2. Get All related Addresses from AddressRepository using addressIds
                 //3. Convert and Add the Addresses to the CustomerBO
@@ -67,7 +72,7 @@ namespace CustomerAppBLL.Services
                     .ToList();*/
 
                 cust.Addresses = uow.AddressRepository.GetAllById(cust.AddressIds)
-                    .Select(a => aConv.Convert(a))
+                    .Select(a => _aConv.Convert(a))
                     .ToList();
 
                 //4. Return the Customer
@@ -77,32 +82,32 @@ namespace CustomerAppBLL.Services
 
         public List<CustomerBO> GetAll()
         {
-			using (var uow = facade.UnitOfWork)
+			using (var uow = _facade.UnitOfWork)
 			{
                 //Customer -> CustomerBO
                 //return uow.CustomerRepository.GetAll();
-                return uow.CustomerRepository.GetAll().Select(conv.Convert).ToList();
+                return uow.CustomerRepository.GetAll().Select(_cConv.Convert).ToList();
 			}
         }
 
         public List<CustomerBO> 
         GetAllByFirstName(string t, int ps, int cp)
         {
-            using (var uow = facade.UnitOfWork){
+            using (var uow = _facade.UnitOfWork){
                 var skip = (ps * cp) - ps;
                 return uow.CustomerRepository
                           .GetAll()
                           .Where(c => c.FirstName.Contains(t))
                           .Skip(skip)
                           .Take(ps)
-                          .Select(c => conv.Convert(c))
+                          .Select(c => _cConv.Convert(c))
                           .ToList();
             }
         }
 
         public CustomerBO Update(CustomerBO cust)
         {
-            using (var uow = facade.UnitOfWork)
+            using (var uow = _facade.UnitOfWork)
             {
                 var customerFromDb = uow.CustomerRepository.Get(cust.Id);
 				if (customerFromDb == null)
@@ -110,7 +115,7 @@ namespace CustomerAppBLL.Services
 					throw new InvalidOperationException("Customer not found");
 				}
 
-                var customerUpdated = conv.Convert(cust);
+                var customerUpdated = _cConv.Convert(cust);
 				customerFromDb.FirstName = customerUpdated.FirstName;
 				customerFromDb.LastName = customerUpdated.LastName;
 
@@ -134,7 +139,7 @@ namespace CustomerAppBLL.Services
                     customerUpdated.Addresses);
 
                 uow.Complete();
-				return conv.Convert(customerFromDb);
+                return _cConv.Convert(customerFromDb);
             }
 
         }

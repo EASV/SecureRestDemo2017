@@ -6,9 +6,9 @@ using System.Text;
 
 namespace CustomerAppBLL.Converters
 {
-    class AddressConverter
+    public class AddressConverter: IConverter<Address, AddressBO>
     {
-        internal Address Convert(AddressBO address)
+        public Address Convert(AddressBO address)
         {
             if (address == null) { return null; }
             return new Address()
@@ -20,7 +20,7 @@ namespace CustomerAppBLL.Converters
             };
         }
 
-        internal AddressBO Convert(Address address)
+        public AddressBO Convert(Address address)
         {
             if (address == null) { return null; }
             return new AddressBO()

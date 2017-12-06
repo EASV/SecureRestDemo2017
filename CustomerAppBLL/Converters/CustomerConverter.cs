@@ -4,16 +4,9 @@ using System.Linq;
 
 namespace CustomerAppBLL.Converters
 {
-    class CustomerConverter
+    public class CustomerConverter: IConverter<Customer, CustomerBO>
     {
-        private AddressConverter aConv;
-
-        public CustomerConverter()
-        {
-            aConv = new AddressConverter();
-        }
-
-        internal Customer Convert(CustomerBO cust)
+        public Customer Convert(CustomerBO cust)
         {
             if (cust == null) { return null; }
             return new Customer()
@@ -28,7 +21,7 @@ namespace CustomerAppBLL.Converters
             };
         }
 
-        internal CustomerBO Convert(Customer cust)
+        public CustomerBO Convert(Customer cust)
         {
 			if (cust == null) { return null; }
             return new CustomerBO()

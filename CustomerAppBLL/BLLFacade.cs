@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using CustomerAppBLL.Converters;
 
 namespace CustomerAppBLL
 {
@@ -20,25 +21,10 @@ namespace CustomerAppBLL
             });
         }
 
-        public ICustomerService CustomerService
-        {
-            get { return new CustomerService(facade); }
-        }
-
-        public IOrderService OrderService
-        {
-            get { return new OrderService(facade); }
-        }
-
-        public IAddressService AddressService
-        {
-            get { return new AddressService(facade); }
-        }
-
-        public IUserService UserService
-        {
-            get { return new UserService(facade); }
-        }
+        public ICustomerService CustomerService => new CustomerService(facade); 
+        public IOrderService OrderService => new OrderService(facade);
+        public IAddressService AddressService => new AddressService(facade);
+        public IUserService UserService => new UserService(facade);
 
     }
 }

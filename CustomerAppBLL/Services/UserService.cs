@@ -5,25 +5,28 @@ using CustomerAppBLL.BusinessObjects;
 using CustomerAppDAL;
 using CustomerAppBLL.Converters;
 using System.Linq;
+using CustomerAppDAL.Entities;
 
 namespace CustomerAppBLL.Services
 {
     class UserService : IUserService
     {
-        UserConverter conv = new UserConverter();
-        private DALFacade _facade;
-        public UserService(DALFacade facade)
+        IConverter<User, UserBO> _conv;
+        private IDALFacade _facade;
+        public UserService(IDALFacade facade,
+                           IConverter<User, UserBO> conv = null)
         {
             _facade = facade;
+            _conv = conv ?? new UserConverter();
         }
 
         public UserBO Create(UserBO user)
         {
             using (var uow = _facade.UnitOfWork)
             {
-                var userEntity = uow.UserRepository.Create(conv.Convert(user));
+                var userEntity = uow.UserRepository.Create(_conv.Convert(user));
                 uow.Complete();
-                return conv.Convert(userEntity);
+                return _conv.Convert(userEntity);
             }
         }
 
@@ -33,7 +36,7 @@ namespace CustomerAppBLL.Services
             {
                 var userEntity = uow.UserRepository.Delete(Id);
                 uow.Complete();
-                return conv.Convert(userEntity);
+                return _conv.Convert(userEntity);
             }
         }
 
@@ -42,7 +45,7 @@ namespace CustomerAppBLL.Services
             using (var uow = _facade.UnitOfWork)
             {
                 var userEntity = uow.UserRepository.Get(Id);
-                return conv.Convert(userEntity);
+                return _conv.Convert(userEntity);
             }
         }
 
@@ -50,7 +53,7 @@ namespace CustomerAppBLL.Services
         {
             using (var uow = _facade.UnitOfWork)
             {
-                return uow.UserRepository.GetAll().Select(conv.Convert).ToList();
+                return uow.UserRepository.GetAll().Select(_conv.Convert).ToList();
             }
         }
 
@@ -64,7 +67,7 @@ namespace CustomerAppBLL.Services
                     throw new InvalidOperationException("User not found");
                 }
                 uow.Complete();
-                return conv.Convert(userEntity);
+                return _conv.Convert(userEntity);
             }
         }
     }

@@ -5,18 +5,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CustomerAppDAL.Entities;
 
 namespace CustomerAppBLL.Services
 {
     public class AddressService : IAddressService
     {
-        AddressConverter _conv;
-        DALFacade _facade;
+        IConverter<Address, AddressBO> _conv;
+        IDALFacade _facade;
 
-        public AddressService(DALFacade facade)
+        public AddressService(IDALFacade facade,
+                              IConverter<Address, AddressBO> conv = null)
         {
             _facade = facade;
-            _conv = new AddressConverter();
+            /*if(conv != null){
+                _conv = conv;
+            }
+            else{
+                _conv = new AddressConverter();
+            }*/
+            _conv = conv ?? new AddressConverter();
         }
 
         public AddressBO Create(AddressBO address)

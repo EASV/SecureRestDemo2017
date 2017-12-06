@@ -3,9 +3,9 @@ using CustomerAppDAL.Entities;
 
 namespace CustomerAppBLL.Converters
 {
-    class OrderConverter
+    public class OrderConverter: IConverter<Order, OrderBO>
     {
-        internal Order Convert(OrderBO order)
+        public Order Convert(OrderBO order)
         {
 			if (order == null) { return null; }
 			return new Order()
@@ -17,7 +17,7 @@ namespace CustomerAppBLL.Converters
             };
         }
 
-        internal OrderBO Convert(Order order)
+        public OrderBO Convert(Order order)
         {
 			if (order == null) { return null; }
 			return new OrderBO()

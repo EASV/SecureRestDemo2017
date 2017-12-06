@@ -11,5 +11,7 @@
 
   <ItemGroup>
     <Folder Include="UOW\" />
+    <Folder Include="Facade\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 </Project>

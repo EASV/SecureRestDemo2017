@@ -6,7 +6,7 @@ using CustomerAppDAL.UOW;
 
 namespace CustomerAppDAL
 {
-    public class DALFacade
+    public class DALFacade: IDALFacade
     {
         DbOptions opt;
         public DALFacade(DbOptions opt){

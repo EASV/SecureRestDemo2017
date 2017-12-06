@@ -5,25 +5,28 @@ using CustomerAppBLL.BusinessObjects;
 using CustomerAppDAL;
 using CustomerAppBLL.Converters;
 using System.Linq;
+using CustomerAppDAL.Entities;
 
 namespace CustomerAppBLL.Services
 {
     class OrderService : IOrderService
     {
-        OrderConverter conv = new OrderConverter();
-        private DALFacade _facade;
-        public OrderService(DALFacade facade)
+        IConverter<Order, OrderBO> _conv;
+        private IDALFacade _facade;
+        public OrderService(IDALFacade facade, 
+                            IConverter<Order, OrderBO> conv = null)
         {
             _facade = facade;
+            _conv = conv ?? new OrderConverter();
         }
 
         public OrderBO Create(OrderBO order)
         {
             using (var uow = _facade.UnitOfWork)
             {
-                var orderEntity = uow.OrderRepository.Create(conv.Convert(order));
+                var orderEntity = uow.OrderRepository.Create(_conv.Convert(order));
                 uow.Complete();
-                return conv.Convert(orderEntity);
+                return _conv.Convert(orderEntity);
             }
         }
 
@@ -33,7 +36,7 @@ namespace CustomerAppBLL.Services
             {
                 var orderEntity = uow.OrderRepository.Delete(Id);
                 uow.Complete();
-                return conv.Convert(orderEntity);
+                return _conv.Convert(orderEntity);
             }
         }
 
@@ -43,7 +46,7 @@ namespace CustomerAppBLL.Services
             {
                 var orderEntity = uow.OrderRepository.Get(Id);
                 orderEntity.Customer = uow.CustomerRepository.Get(orderEntity.CustomerId);
-                return conv.Convert(orderEntity);
+                return _conv.Convert(orderEntity);
             }
         }
 
@@ -51,7 +54,7 @@ namespace CustomerAppBLL.Services
         {
             using (var uow = _facade.UnitOfWork)
             {
-                return uow.OrderRepository.GetAll().Select(conv.Convert).ToList();
+                return uow.OrderRepository.GetAll().Select(_conv.Convert).ToList();
             }
         }
 
@@ -70,7 +73,7 @@ namespace CustomerAppBLL.Services
                 uow.Complete();
                 //BLL choice
                 orderEntity.Customer = uow.CustomerRepository.Get(orderEntity.CustomerId);
-                return conv.Convert(orderEntity);
+                return _conv.Convert(orderEntity);
             }
         }
     }
